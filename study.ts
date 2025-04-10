@@ -1,19 +1,15 @@
-// @ts-nocheck
-const http = require("http");
-let count = 0;
+import http from 'k6/http';
+import { check, sleep } from 'k6';
 
-const server = http.createServer((req, res)=> {
-    log(count);
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    res.write("hello\n");
-    setTimeout(()=>{
-        res.end("Node.js");
-    }, 2000);
-});
+export const options = {
+  vus: 10,
+  duration: '30s',
+};
 
-function log(count){
-    console.log((count += 1));
-
+export default function () {
+  const res = http.get('http://test.k6.io');
+  check(res, {
+    'status is 200': (r) => r.status === 200,
+  });
+  sleep(1);
 }
-server.listen(8000);
